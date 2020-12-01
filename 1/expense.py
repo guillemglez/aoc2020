@@ -207,10 +207,14 @@ expenses: List[int] = []
 for line in expenses_input.split():
     expenses.append(int(line))
 
-against = expenses
+against = expenses.copy()
 for i in reversed(expenses):
     against.pop()
+    third = against.copy()
     for j in against:
         if (i + j) == 2020:
             print(f"{i}*{j} = {i*j}")
-            break
+        third.pop()
+        for k in third:
+            if (i + j + k) == 2020:
+                print(f"{i}*{j}*{k} = {i*j*k}")
