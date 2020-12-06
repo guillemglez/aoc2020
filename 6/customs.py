@@ -1,17 +1,20 @@
-from typing import Dict
+from typing import Dict, List
 
 ABC: str = 'abcdefghijklmnopqrstuvwxyz'
 
 with open('input') as f:
     inpt: str = f.read()
 
-counts = 0
+count = 0
 for group in inpt.split('\n\n'):
-    questions: Dict[str, bool] = {k: False for k in ABC}
-    for question in group:
-        if question in questions.keys():
-            questions[question] = True
-    count = list(questions.values()).count(True)
-    counts += count
+    people: List[str] = group.split()
+    questions: List[str] = [q for q in people.pop()]
 
-print(f'The sum of counts is {counts}')
+    for person in people:
+        for question in questions.copy():
+            if question not in person:
+                questions.remove(question)
+
+    count += len(questions)
+
+print(f'The sum of counts is {count}')
