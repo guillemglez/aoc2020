@@ -5,29 +5,6 @@ SHINY = 'shiny gold'
 with open('input') as f:
     inpt = f.read()
 
-### PART 1
-
-can: int = 0
-could: int = 0
-unchanged: bool = False
-bags: List[str] = [SHINY]
-
-while not unchanged:
-    for line in inpt.split('\n'):
-        for bag in bags.copy():
-            if bag in line and not line.startswith(bag):
-                other = line.split(' bags')[0]
-                if other not in bags:
-                    bags.append(other)
-                    can += 1
-    unchanged = (can - could) == 0
-    if not unchanged:
-        could = can
-
-print(f'{can} bag types can carry a {SHINY} bag.')
-
-### PART 2
-
 bagmap: Dict[str, List[Tuple[int, str]]] = {}
 for line in inpt.split('\n'):
     if not 'bags' in line:
@@ -42,10 +19,23 @@ for line in inpt.split('\n'):
         bagmap[this].append((num, bag))
 
 
-def resolve(bag: str) -> int:
+def carry(target: str) -> int:
     total = 1
-    for num, other in bagmap[bag]:
-        total += num * resolve(other)
+    for carrier, carried in bagmap.copy().items():
+        for num, bag in carried:
+            if bag == target:
+                bagmap.pop(carrier)
+                total += carry(carrier)
+                break
     return total
 
-print(f"A {SHINY} bag must contain {resolve(SHINY) - 1} other bags.")
+
+def contains(bag: str) -> int:
+    total = 1
+    for num, other in bagmap[bag]:
+        total += num * contains(other)
+    return total
+
+
+print(f'{carry(SHINY) - 1} bag types can carry a {SHINY} bag.')
+print(f"A {SHINY} bag must contain {contains(SHINY) - 1} other bags.")
