@@ -23,4 +23,13 @@ for number in inpt:
     header.pop(0)
     header.append(number)
 
+for i, number in enumerate(inpt):
+    contiguous: List[int] = [number]
+    while sum(contiguous) < invalid:
+        contiguous.append(inpt[i + len(contiguous)])
+
+    if sum(contiguous) == invalid:
+        break
+
 print(f"The fist number not sticking to the rule is {invalid}")
+print(f"The encription weakness is {min(contiguous) + max(contiguous)}")
