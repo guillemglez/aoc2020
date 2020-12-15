@@ -4,7 +4,7 @@ INPUT: List[int] = [0, 12, 6, 13, 20, 1, 17]
 
 game: Dict[int, Tuple[int, int]] = {}
 lastnumber: int = -1
-for play in range(2020):
+for play in range(30000000):
     if play < len(INPUT):
         number = INPUT[play]
     else:
@@ -15,5 +15,6 @@ for play in range(2020):
     else:
         game[number] = game[number][1], play
     lastnumber = number
-
-print(f"The 2020th number will be {lastnumber}")
+    if play == 2020 - 1:
+        print(f"The 2020th number will be {lastnumber}")
+print(f"The 30000000th number will be {lastnumber}")
