@@ -7,6 +7,10 @@ from tile import Tile
 BLACK = '#'
 WHITE = '.'
 
+MONSTER = """                  # 
+#    ##    ##    ###
+ #  #  #  #  #  #   """
+
 with open('input') as f:
     inpt = f.read().strip()
 
@@ -63,6 +67,42 @@ while len(bag):
             else:
                 tile.flip(flip)
 
+desert = np.zeros(tuple([x * 8 for x in canvas.shape]), dtype=np.uint8)
+for idx, tile in np.ndenumerate(canvas):
+    row, col = idx
+    desert[row * 8:(row + 1) * 8,
+           col * 8:(col + 1) * 8] = tile.image.astype(np.uint8)
+
+# Parse MONSTER input
+monster = np.zeros((len(MONSTER.split('\n')), len(MONSTER.split('\n')[0])),
+                   dtype=np.uint8)
+for row, line in enumerate(MONSTER.split('\n')):
+    for col, char in enumerate(list(line)):
+        if char != BLACK:
+            monster[row, col] = 1
+
+# Look for monsters
+rough = np.count_nonzero(desert == 0)
+# Flip desert in both axis
+for flip in range(2):
+    # Rotate desert 90, 180 and 270 degrees (anticlockwise)
+    for _ in range(3):
+        for idx in np.ndindex(desert.shape):
+            row, col = idx
+            if row + monster.shape[0] >= desert.shape[0]:
+                continue
+            if col + monster.shape[1] >= desert.shape[1]:
+                continue
+            if np.all(desert[row:row + monster.shape[0],
+                             col:col + monster.shape[1]][monster == 0] == 0):
+                rough -= np.count_nonzero(monster == 0)
+        desert = np.rot90(desert)
+    if flip == Tile.VERTICAL:
+        desert = np.flipud(desert)
+    if flip == Tile.HORIZONTAL:
+        desert = np.fliplr(desert)
+
 print(
     f"The four corner tiles multiplied give {canvas[0,0].id * canvas[0,-1].id * canvas[-1,0].id * canvas[-1,-1].id}"
 )
+print(f"The waters are rough by {rough}")

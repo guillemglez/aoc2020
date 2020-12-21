@@ -22,6 +22,7 @@ class Tile:
             self.bordertoint(image[-1, ::-1].flatten()),
             self.bordertoint(image[::-1, 0].flatten())
         ]
+        self.image = image[1:-1, 1:-1]
 
     def bordertoint(self, pixels: np.ndarray) -> int:
         """Convert border to an int ID (bit representation)"""
@@ -41,6 +42,7 @@ class Tile:
             self.getborder(self.RIGHT),
             self.getborder(self.BOTTOM)
         ]
+        self.image = np.rot90(self.image, k=3)
 
     def getborder(self, border: int, candidate: bool = False) -> int:
         """
@@ -70,6 +72,7 @@ class Tile:
                 self.invertborder(self.getborder(self.TOP)),
                 self.invertborder(self.getborder(self.LEFT))
             ]
+            self.image = np.flipud(self.image)
         else:  # self.HORIZONTAL
             self.borders = [
                 self.invertborder(self.getborder(self.TOP)),
@@ -77,6 +80,7 @@ class Tile:
                 self.invertborder(self.getborder(self.BOTTOM)),
                 self.invertborder(self.getborder(self.RIGHT))
             ]
+            self.image = np.fliplr(self.image)
 
     def fitsin(self, canvas, row, col):
         checked_tiles = 0  # If no tiles around this position, then it is not declared as fitting
