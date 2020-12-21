@@ -32,5 +32,23 @@ for ingredient, susceptible in allergens.items():
     if len(susceptible) == 0:
         count += all_ingredients.count(ingredient)
 
+dangerous: Dict[str, str] = {}
+while len(allergens):
+    for ingredient, susceptible in allergens.copy().items():
+        if len(susceptible) == 0:
+            allergens.pop(ingredient)
+            continue
+        if len(susceptible) == 1:
+            dangerous[ingredient] = susceptible.pop()
+            for s in allergens.values():
+                if dangerous[ingredient] in s:
+                    s.remove(dangerous[ingredient])
+            break
+
+# Sort list of (key, value) tuples by value, then back to a dict, then extract the keys from it
+canonical = ','.join(
+    (dict(sorted(dangerous.items(), key=lambda allergen: allergen[1]))).keys())
+
 print(
     f"Confidently non-allergic ingredients appear {count} times in the list.")
+print(f"The canonical dangerous ingredient list is {canonical}")
