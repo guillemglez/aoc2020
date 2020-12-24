@@ -1,5 +1,3 @@
-#include <string.h>
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,7 +6,18 @@
 
 void play(const std::string labeling, const int moves)
 {
-    std::vector<int> cups(labeling.length() + 1, 0);
+    const bool million = moves > 10e5;
+
+    std::vector<int> cups;
+    if (million)
+    {
+        cups = std::vector<int>(10e5 + 1, 0);
+    }
+    else
+    {
+        cups = std::vector<int>(labeling.length() + 1, 0);
+    }
+
     for (auto it = labeling.begin(); it != std::prev(labeling.end()); it = std::next(it))
     {
         const int cup = *it - '0';
@@ -16,7 +25,22 @@ void play(const std::string labeling, const int moves)
     }
 
     int current = *labeling.begin() - '0';
-    cups.at(*std::prev(labeling.end()) - '0') = current;
+
+    if (million)
+    {
+        int cup = labeling.length() + 1;
+        cups.at(*std::prev(labeling.end()) - '0') = cup;
+        while (cup < 10e5)
+        {
+            cups.at(cup) = cup + 1;
+            cup++;
+        }
+        cups.at(cup) = current;
+    }
+    else
+    {
+        cups.at(*std::prev(labeling.end()) - '0') = current;
+    }
 
     int move = 0;
     while (move++ < moves)
@@ -47,10 +71,17 @@ void play(const std::string labeling, const int moves)
     }
 
     int next = cups.at(1);
-    while (next != 1)
+    if (million)
     {
-        std::cout << next;
-        next = cups.at(next);
+        std::cout << static_cast<long long>(next) * cups.at(next);
+    }
+    else
+    {
+        while (next != 1)
+        {
+            std::cout << next;
+            next = cups.at(next);
+        }
     }
 }
 
@@ -58,6 +89,10 @@ int main()
 {
     std::cout << "The labels on the cups are ";
     play(INPUT, 100);
+    std::cout << std::endl;
+
+    std::cout << "The stars' labels multiplied give ";
+    play(INPUT, 10e6);
     std::cout << std::endl;
 
     return 0;
