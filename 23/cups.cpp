@@ -1,90 +1,56 @@
 #include <string.h>
 
-#include <algorithm>
 #include <iostream>
-#include <list>
-#include <queue>
 #include <string>
+#include <vector>
 
-#define INPUT "614752839" // "389125467"
+#define INPUT "614752839"
 
 void play(const std::string labeling, const int moves)
 {
-    std::list<int> cups;
-    int maxCup = -1;
-    for (char const &c : labeling)
+    std::vector<int> cups(labeling.length() + 1, 0);
+    for (auto it = labeling.begin(); it != std::prev(labeling.end()); it = std::next(it))
     {
-        const int cup = c - '0';
-        cups.push_back(cup);
-        if (cup > maxCup)
-        {
-            maxCup = cup;
-        }
+        const int cup = *it - '0';
+        cups.at(cup) = *std::next(it) - '0';
     }
 
-    std::list<int>::iterator current = cups.begin();
+    int current = *labeling.begin() - '0';
+    cups.at(*std::prev(labeling.end()) - '0') = current;
+
     int move = 0;
     while (move++ < moves)
     {
-        auto asideit = std::next(current, 1);
-        std::queue<std::list<int>::iterator> aside;
-        std::list<int> asidev;
+        const int aside = cups.at(current);
+        int last = current;
+        int destination = current - 1;
         for (int i = 0; i < 3; i++)
         {
-            if (asideit == cups.end())
+            if (destination == 0)
             {
-                asideit = cups.begin();
+                destination = cups.size() - 1;
             }
-            aside.push(asideit);
-            asidev.push_back(*asideit);
-            std::advance(asideit, 1);
+            last = cups.at(last);
+            if (last == destination)
+            {
+                destination--;
+                i = -1;
+                last = current;
+            }
         }
 
-        int destLabel = *current - 1;
-        int i = 0;
-        while (i++ < 100)
-        {
-            if (destLabel == 0)
-            {
-                destLabel = maxCup;
-            }
-            if (std::find(asidev.begin(), asidev.end(), destLabel) != asidev.end())
-            {
-                destLabel--;
-                continue;
-            }
-            auto destination = std::find(cups.begin(), cups.end(), destLabel);
-            if (destination != cups.end())
-            {
-                std::advance(destination, 1);
-                for (int i = 0; i < 3; i++)
-                {
-                    cups.splice(destination, cups, aside.front());
-                    aside.pop();
-                }
-                break;
-            }
-            destLabel--;
-        }
+        cups.at(current) = cups.at(last);
+        cups.at(last) = cups.at(destination);
+        cups.at(destination) = aside;
 
-        std::advance(current, 1);
-        if (current == cups.end())
-        {
-            current = cups.begin();
-        }
+        current = cups.at(current);
     }
 
-    auto one = std::find(cups.begin(), cups.end(), 1);
-    auto it = std::next(one, 1);
-
-    while (it != one)
+    int next = cups.at(1);
+    while (next != 1)
     {
-        if (it == cups.end())
-        {
-            it = cups.begin();
-        }
-        std::cout << *it;
-        std::advance(it, 1);
+        std::cout << next;
+        next = cups.at(next);
     }
 }
 
