@@ -1,5 +1,3 @@
-from typing import List
-
 SUBJECT = 7
 INPUT = (1526110, 20175123)
 
